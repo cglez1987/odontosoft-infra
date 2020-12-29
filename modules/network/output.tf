@@ -22,3 +22,8 @@ output "elb_sg_id" {
   description = "Identifier of security group for ELB"
   value = aws_security_group.elb_sg.id
 }
+
+output "ec2_sg_id" {
+  description = "Identifier of security group for EC2"
+  value = aws_security_group.ec2_sg.id
+}

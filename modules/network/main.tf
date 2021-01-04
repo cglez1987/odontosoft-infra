@@ -17,19 +17,11 @@ resource "aws_internet_gateway" "main_igw" {
   }
 }
 
-resource "aws_subnet" "subnet1" {
+resource "aws_subnet" "subnet" {
+  count             = length(var.subnet_cidr_block)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.subnet_cidr_block1
-  availability_zone = data.aws_availability_zones.available.names[0]
-  tags = {
-    stage = var.stage
-  }
-}
-
-resource "aws_subnet" "subnet2" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.subnet_cidr_block2
-  availability_zone = data.aws_availability_zones.available.names[1]
+  cidr_block        = var.subnet_cidr_block[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
   tags = {
     stage = var.stage
   }
@@ -70,7 +62,7 @@ resource "aws_security_group" "elb_sg" {
   }
 }
 
-resource "aws_security_group" "ec2-sg" {
+resource "aws_security_group" "ec2_sg" {
   name   = "ec2-sg"
   vpc_id = aws_vpc.main.id
 

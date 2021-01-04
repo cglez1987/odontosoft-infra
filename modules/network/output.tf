@@ -9,14 +9,13 @@ output "vpc_arn" {
   value       = aws_vpc.main.arn
 }
 
-output "subnet1_id" {
-  description = "Identifier of subnet1"
-  value       = aws_subnet.subnet1.id
+output "subnets_id" {
+  description = "Ids of subnets"
+  value       = aws_subnet.subnet[*].id
 }
 
-output "subnet2_id" {
-  description = "Identifier of subnet2"
-  value       = aws_subnet.subnet2.id
+output "ava_zones" {
+  value = data.aws_availability_zones.available.names[*]
 }
 
 output "elb_sg_id" {

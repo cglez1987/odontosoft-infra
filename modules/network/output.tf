@@ -1,6 +1,7 @@
 output "vpc_id" {
   description = "Identifier of my VPC"
   value       = aws_vpc.main.id
+  sensitive = false
 }
 
 output "vpc_arn" {

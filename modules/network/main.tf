@@ -11,7 +11,7 @@ module "vpc" {
   public_subnets  = var.public_subnets_cidr
 
   tags = {
-    Environment = var.stage
+    stage = var.stage
   }
 }
 

@@ -1,35 +1,33 @@
 variable "region" {
-  type    = string
-  default = "us-east-1"
+  type = string
+}
+
+variable "availability_zones" {
+  type        = list(any)
+  description = "List of AZs to use"
 }
 
 variable "stage" {
   type        = string
   description = "Name of the stage to build this module"
-  default     = "dev"
 }
 
 variable "vpc_name" {
-  type    = string
-  default = "my_vpc"
+  type        = string
+  description = "Name of the VPC"
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.0.0.0/16"
+  type        = string
+  description = "Cidr to use in the VPC"
 }
 
 variable "public_subnets_cidr" {
-  type    = list(any)
-  default = ["10.0.1.0/24", "10.0.2.0/24"]
+  type        = list(any)
+  description = "List of cidr to use as public subnets"
 }
 
 variable "private_subnets_cidr" {
-  type    = list(any)
-  default = ["10.0.101.0/24", "10.0.102.0/24"]
-}
-
-variable "availability_zones" {
-  type    = list(any)
-  default = ["us-east-1a", "us-east-1b"]
+  type        = list(any)
+  description = "List of cidr to use as private subnets"
 }

@@ -7,9 +7,9 @@ module "network" {
 
 resource "aws_lb" "app_elb" {
   load_balancer_type = "application"
-  internal           = false
-  security_groups    = [module.network.elb_sg_id]
-  subnets            = module.network.subnets_id
+  internal           = var.elb_is_internal
+  security_groups    = [module.network.default_security_group_id]
+  subnets            = module.network.public_subnets
 
   tags = {
     "stage" = var.stage
@@ -18,8 +18,8 @@ resource "aws_lb" "app_elb" {
 
 resource "aws_lb_listener" "app_listener" {
   load_balancer_arn = aws_lb.app_elb.arn
-  port              = "80"
-  protocol          = "HTTP"
+  port              = var.elb_port
+  protocol          = var.elb_protocol
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app_target_group.arn
@@ -28,9 +28,16 @@ resource "aws_lb_listener" "app_listener" {
 
 resource "aws_lb_target_group" "app_target_group" {
   deregistration_delay = 30
-  port                 = 80
-  protocol             = "HTTP"
+  port                 = var.elb_port
+  protocol             = var.elb_protocol
   vpc_id               = module.network.vpc_id
+  health_check {
+    path                = var.elb_hc_path
+    interval            = 30
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+  }
 }
 
 
@@ -38,27 +45,22 @@ data "aws_ami_ids" "amazon_linux" {
   owners = ["amazon"]
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = var.ami_names_to_filter
   }
 }
 
 resource "aws_launch_template" "app_launch_template" {
-  name = "app_backend"
-
-  block_device_mappings {
-    device_name = "/dev/sda1"
-    ebs {
-      volume_size = 8
-    }
-  }
+  name = var.launch_template_name
 
   image_id = data.aws_ami_ids.amazon_linux.ids[0]
 
   instance_initiated_shutdown_behavior = "terminate"
 
-  instance_type = "t2.micro"
+  instance_type = var.lt_instance_type
 
-  # vpc_security_group_ids = [module.network.ec2_sg_id]
+  key_name = var.lt_key_pair_name
+
+  vpc_security_group_ids = [module.network.default_security_group_id]
 
   tag_specifications {
     resource_type = "instance"
@@ -71,11 +73,11 @@ resource "aws_launch_template" "app_launch_template" {
 }
 
 resource "aws_autoscaling_group" "bar" {
-  availability_zones = [module.network.ava_zones[0], module.network.ava_zones[1]]
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
-  target_group_arns = [aws_lb_target_group.app_target_group.arn]
+  desired_capacity    = 1
+  max_size            = 1
+  min_size            = 1
+  target_group_arns   = [aws_lb_target_group.app_target_group.arn]
+  vpc_zone_identifier = module.network.public_subnets
 
   launch_template {
     id      = aws_launch_template.app_launch_template.id

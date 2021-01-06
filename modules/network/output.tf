@@ -1,29 +1,28 @@
 output "vpc_id" {
-  description = "Identifier of my VPC"
-  value       = aws_vpc.main.id
-  sensitive = false
+  description = "ID of my VPC"
+  value       = module.vpc.vpc_id
+  sensitive   = false
 }
 
-output "vpc_arn" {
-  description = "Arn of my VPC"
-  value       = aws_vpc.main.arn
+output "private_subnets" {
+  description = "List of IDs of private subnets"
+  value       = module.vpc.private_subnets
 }
 
-output "subnets_id" {
-  description = "Ids of subnets"
-  value       = aws_subnet.subnet[*].id
+output "public_subnets" {
+  description = "List of IDs of public subnets"
+  value       = module.vpc.public_subnets
 }
 
-output "ava_zones" {
-  value = data.aws_availability_zones.available.names[*]
+output "azs" {
+  description = "A list of availability zones spefified as argument to this module"
+  value       = module.vpc.azs
 }
 
-output "elb_sg_id" {
-  description = "Identifier of security group for ELB"
-  value = aws_security_group.elb_sg.id
+output "default_security_group_id" {
+  value = module.vpc.default_security_group_id
 }
 
-output "ec2_sg_id" {
-  description = "Identifier of security group for EC2"
-  value = aws_security_group.ec2_sg.id
+output "http_security_group" {
+  value = module.http_80_security_group.this_security_group_id
 }

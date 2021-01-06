@@ -1,99 +1,27 @@
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~>2.64.0"
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
+  name = var.vpc_name
 
-resource "aws_vpc" "main" {
-  cidr_block = var.cidr_block
-  tags = {
-    "stage" = var.stage
-  }
-}
+  cidr = var.vpc_cidr
 
-resource "aws_internet_gateway" "main_igw" {
-  vpc_id = aws_vpc.main.id
-  tags = {
-    "stage" = var.stage
-  }
-}
-
-resource "aws_subnet" "subnet" {
-  count             = length(var.subnet_cidr_block)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.subnet_cidr_block[count.index]
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-  tags = {
-    stage = var.stage
-  }
-}
-
-resource "aws_security_group" "elb_sg" {
-  name   = "elb_sg"
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  azs             = var.availability_zones
+  private_subnets = var.private_subnets_cidr
+  public_subnets  = var.public_subnets_cidr
 
   tags = {
-    stage = var.stage
+    Environment = var.stage
   }
 }
 
-resource "aws_security_group" "ec2_sg" {
-  name   = "ec2-sg"
-  vpc_id = aws_vpc.main.id
+module "http_80_security_group" {
+  source  = "terraform-aws-modules/security-group/aws//modules/http-80"
+  version = "~> 3.0"
 
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  name        = "http-sg"
+  description = "Security group with HTTP ports open for everybody (IPv4 CIDR), egress ports are all world open"
+  vpc_id      = module.vpc.vpc_id
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    stage = var.stage
-  }
+  ingress_cidr_blocks = ["0.0.0.0/0"]
 }
-

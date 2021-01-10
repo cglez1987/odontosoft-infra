@@ -2,7 +2,7 @@ terraform {
   required_version = "=0.14.3"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = ">=3.22"
     }
   }
@@ -40,4 +40,13 @@ module "app_backend" {
   launch_template_name            = var.launch_template_name
   lt_instance_type                = var.lt_instance_type
   lt_key_pair_name                = var.lt_key_pair_name
+}
+
+module "app_frontend" {
+  source            = "../modules/frontend"
+  region            = var.region
+  stage             = var.stage
+  app_name          = var.app_name
+  bucket_acl        = var.bucket_acl
+  bucket_versioning = var.bucket_versioning
 }

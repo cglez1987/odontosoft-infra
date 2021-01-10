@@ -58,3 +58,15 @@ variable "lt_instance_type" {
 variable "lt_key_pair_name" {
   type = string
 }
+
+variable "app_name" {
+  type = string
+}
+
+variable "bucket_acl" {
+  type = string
+}
+
+variable "bucket_versioning" {
+  type = bool
+}

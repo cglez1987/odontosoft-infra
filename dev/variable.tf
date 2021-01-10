@@ -70,3 +70,15 @@ variable "bucket_acl" {
 variable "bucket_versioning" {
   type = bool
 }
+
+variable "asg_min_instances" {
+  type = number
+}
+
+variable "asg_max_instances" {
+  type = number
+}
+
+variable "asg_desired_instances" {
+  type = number
+}

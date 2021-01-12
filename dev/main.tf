@@ -40,6 +40,9 @@ module "app_backend" {
   launch_template_name            = var.launch_template_name
   lt_instance_type                = var.lt_instance_type
   lt_key_pair_name                = var.lt_key_pair_name
+  asg_desired_instances           = var.asg_desired_instances
+  asg_max_instances               = var.asg_max_instances
+  asg_min_instances               = var.asg_min_instances
 }
 
 module "app_frontend" {

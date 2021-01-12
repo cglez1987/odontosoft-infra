@@ -74,17 +74,17 @@ variable "asg_subnets" {
   description = "List of subnets for Auto Scaling Group"
 }
 
-variable "asg_max_capacity" {
+variable "asg_max_instances" {
   type        = number
   description = "Maximum number of EC2 instances in auto scaling group"
 }
 
-variable "asg_min_capacity" {
+variable "asg_min_instances" {
   type        = number
   description = "Minimum number of EC2 instances in auto scaling group"
 }
 
-variable "asg_desired_capacity" {
+variable "asg_desired_instances" {
   type        = number
   description = "Desired number of EC2 instances in auto scaling group"
 }

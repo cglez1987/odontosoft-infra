@@ -67,9 +67,9 @@ resource "aws_launch_template" "app_launch_template" {
 }
 
 resource "aws_autoscaling_group" "app_asg" {
-  desired_capacity    = var.asg_desired_capacity
-  max_size            = var.asg_max_capacity
-  min_size            = var.asg_min_capacity
+  desired_capacity    = var.asg_desired_instances
+  max_size            = var.asg_max_instances
+  min_size            = var.asg_min_instances
   target_group_arns   = [aws_lb_target_group.app_target_group.arn]
   vpc_zone_identifier = var.asg_subnets
 

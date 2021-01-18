@@ -27,6 +27,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 
 module "cloudfront" {
   source = "terraform-aws-modules/cloudfront/aws"
+  version = "1.4.0"
   # aliases = ["${local.subdomain}.${local.domain_name}"]
 
   comment             = "Frontend Cloudfront for ${var.app_name} app"
@@ -51,7 +52,7 @@ module "cloudfront" {
     }
   }
 
-  default_cache_behavior = {
+  cache_behavior = {
     default = {
       target_origin_id       = "s3_one"
       viewer_protocol_policy = "allow-all"

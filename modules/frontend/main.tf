@@ -51,7 +51,7 @@ module "cloudfront" {
     }
   }
 
-  cache_behavior = {
+  default_cache_behavior = {
     default = {
       target_origin_id       = "s3_one"
       viewer_protocol_policy = "allow-all"

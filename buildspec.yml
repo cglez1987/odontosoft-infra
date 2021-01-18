@@ -1,16 +1,17 @@
 version: 0.2
 
+env:
+  parameter-store:
+    tf_vars_location: /dev/tf_vars_location
+
 phases:
   install:
     commands:
-      - curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-      - apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-      - apt-get update && sudo apt-get install terraform
+      - cd dev
+      - aws s3 cp $tf_vars_location dev.auto.tfvars
   build:
     commands:
-      - cd dev
       - terraform init
       - terraform plan --out=plan_dev.yml
       - terraform apply plan_dev.yml
       - terraform destroy --auto-approve
-      

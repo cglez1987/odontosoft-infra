@@ -4,13 +4,13 @@ pipeline {
         stage("SourceCode") {
             steps{
                 echo "========executing Source Code========"
-                git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/cglez1987/odontosoft-infra.git'
             }
         }
         stage("Build") { 
             steps{
                 echo "====++++executing ++++===="
             }
+        }
     }
     post {
         always{

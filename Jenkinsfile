@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
     stages{
         stage("SourceCode") {
             steps{
@@ -11,19 +11,6 @@ pipeline {
             steps{
                 echo "====++++executing ++++===="
             }
-            post{
-                always{
-                    echo "====++++always++++===="
-                }
-                success{
-                    echo "====++++ executed successfully++++===="
-                }
-                failure{
-                    echo "====++++ execution failed++++===="
-                }
-        
-            }
-        }
     }
     post {
         always{

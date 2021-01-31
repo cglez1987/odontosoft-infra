@@ -1,14 +1,14 @@
 pipeline {
     agent any
     stages{
-        stage("SourceCode") {
+        stage("Validate") {
             steps{
-                echo "========executing Source Code========"
+                echo "========Validating changes========"
             }
         }
-        stage("Build") { 
+        stage("Test") { 
             steps{
-                echo "====++++executing ++++===="
+                echo "====++ Testing with terratest ++++===="
             }
         }
     }

@@ -13,7 +13,7 @@ provider "aws" {
 }
 
 module "app_network" {
-  source               = "../modules/network"
+  source               = "github.com/cglez1987/terraform-modules-infra/network"
   stage                = var.stage
   region               = var.region
   vpc_name             = var.vpc_name
@@ -24,7 +24,7 @@ module "app_network" {
 }
 
 module "app_backend" {
-  source                          = "../modules/backend"
+  source                          = "github.com/cglez1987/terraform-modules-infra/backend"
   stage                           = var.stage
   region                          = var.region
   vpc_id                          = module.app_network.vpc_id
@@ -46,7 +46,7 @@ module "app_backend" {
 }
 
 module "app_frontend" {
-  source            = "../modules/frontend"
+  source            = "github.com/cglez1987/terraform-modules-infra/frontend"
   region            = var.region
   stage             = var.stage
   app_name          = var.app_name

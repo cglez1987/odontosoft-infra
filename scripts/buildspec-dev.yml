@@ -11,7 +11,8 @@ phases:
       - aws s3 cp $tf_vars_location dev.auto.tfvars
   build:
     commands:
+      - terraform validate 
       - terraform init
       - terraform plan --out=plan_dev.yml
-      - terraform apply plan_dev.yml
+      - terraform apply plan_dev.yml --auto-approve
       - terraform destroy --auto-approve

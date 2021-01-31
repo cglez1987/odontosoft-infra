@@ -1,15 +1,13 @@
-pipeline{
-    agent{
-        label any
-    }
+pipeline {
+    agent none
     stages{
-        stage("SourceCode"){
+        stage("SourceCode") {
             steps{
                 echo "========executing Source Code========"
                 git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/cglez1987/odontosoft-infra.git'
             }
         }
-        stage("Build"){
+        stage("Build") { 
             steps{
                 echo "====++++executing ++++===="
             }
@@ -27,7 +25,7 @@ pipeline{
             }
         }
     }
-    post{
+    post {
         always{
             echo "========always========"
         }

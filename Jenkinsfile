@@ -1,26 +1,96 @@
 pipeline {
     agent any
+    environment{
+        VARS_LOCATION = ''
+        ENVIRONMENT_NAME = 'dev'
+    }
     stages{
-        stage("Validate") {
-            steps{
-                echo "========Validating changes========"
+        stage("Configure environment"){
+            agent {
+                docker {
+                   image 'amazon/aws-cli'
+                   args  "--entrypoint=''"
+                }
+            }            
+            steps {
+                script{
+                    echo "Preparing environment"
+                    if ("${env.GIT_BRANCH}" == 'master')
+                    {
+                        VARS_LOCATION = '/prod/tf_vars_location'
+                        ENVIRONMENT_NAME = 'prod'
+                    }
+                    else
+                    {
+                        VARS_LOCATION = '/dev/tf_vars_location'
+                    }
+                    echo "========Preparing the environment========="
+                    dir("${ENVIRONMENT_NAME}"){
+                        sh "aws s3 cp \$(aws ssm get-parameter --name ${VARS_LOCATION} --region us-east-1 --query Parameter.Value --output text) ${ENVIRONMENT_NAME}.auto.tfvars"
+                        stash includes: "${ENVIRONMENT_NAME}.auto.tfvars", name: 'terraform_variables_file'
+                    }
+                }
             }
         }
-        stage("Test") { 
+        stage("Initialization && Validation") {
             steps{
-                echo "====++ Testing with terratest ++++===="
+                dir("${ENVIRONMENT_NAME}"){
+                    echo "========Initializing terraform modules========"
+                    ansiColor('xterm'){
+                        unstash 'terraform_variables_file'
+                        sh 'terraform --version'
+                        sh 'terraform init'
+                    }
+                    echo "========Validate terraform files========"
+                    ansiColor('xterm'){
+                        sh 'terraform validate'
+                    }
+                }
+            }
+        }
+        stage("Planification") { 
+           /* agent {
+                docker {
+                    image 'hashicorp/terraform:light'
+                    args  "--entrypoint=''"
+                }
+            } */
+            steps{
+                dir("${ENVIRONMENT_NAME}"){
+                    echo "====++ Executing terraform plan to review the changes ++++===="
+                    ansiColor('xterm'){
+                        unstash 'terraform_variables_file'
+                        sh "terraform plan -out=${ENVIRONMENT_NAME}-plan"
+                    }
+                }
+            }
+        }
+        stage("Manual Approval"){
+            when {branch 'main'}
+            steps{
+                echo "====++++ Waiting for manual approval ++++===="
+                script{
+                    approvalUser = input(id: 'userInput', message: 'Do you approve this plan?', submitter: 'admin', submitterParameter: 'approvalUser')
+                }
+            }
+        }
+        stage("Deploy") {
+            when {branch 'main'}
+            steps{
+                dir("${ENVIRONMENT_NAME}"){
+                    echo "====++ Applying the changes in the dev stage ++++===="
+                    ansiColor('xterm'){
+                        unstash 'terraform_variables_file'
+                        sh "terraform apply ${ENVIRONMENT_NAME}-plan --auto-approve"
+                    }
+                }
             }
         }
     }
-    post {
+    post{
         always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
+            echo 'Cleaning the workspace'
+            cleanWs()
         }
     }
 }

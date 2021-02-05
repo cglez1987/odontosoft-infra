@@ -99,6 +99,14 @@ pipeline {
 				sh "git push --tags origin"
             }
         }
+        stage("Cleaning"){
+            steps{
+                dir("${ENVIRONMENT_NAME}"){
+                echo "====++++Cleaning the infra++++===="
+                sh 'terraform destroy --auto-approve'
+                }
+            }
+        }
     }
     post{
         success{

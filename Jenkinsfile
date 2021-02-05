@@ -82,7 +82,7 @@ pipeline {
                     echo "====++ Applying the changes in the dev stage ++++===="
                     ansiColor('xterm'){
                         unstash 'terraform_variables_file'
-                        sh "terraform apply ${ENVIRONMENT_NAME}-plan --auto-approve"
+                        sh "terraform apply ${ENVIRONMENT_NAME}-plan"
                     }
                 }
             }

@@ -101,7 +101,7 @@ pipeline {
         }
     }
     post{
-        always{
+        success{
             echo 'Cleaning the workspace'
             cleanWs()
         }
